@@ -3,11 +3,6 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "backend",
-    "frontend",
-    "libs/*"
-  ],
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
