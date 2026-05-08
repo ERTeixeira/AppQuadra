@@ -2,13 +2,10 @@ import { Exclude, Expose } from 'class-transformer';
 import { validate } from 'class-validator';
 
 import {
-  EmailRequired,
-  IDocumentData,
-  PhoneOptional,
-  Result,
-  StringOptional,
-  StringRequired,
-  UuidRequired
+    EmailRequired,
+    IDocumentData,
+    Result,
+    StringRequired,
 } from '@quadra/shared';
 
 import { DocumentData } from '@quadra/shared';
@@ -26,10 +23,6 @@ export class UsuarioModel
   }
 
   @Expose()
-  @UuidRequired('usuario.empresa_id')
-  empresaId!: string;
-
-  @Expose()
   @StringRequired('usuario.nome', 3, 100)
   name!: string;
 
@@ -41,17 +34,16 @@ export class UsuarioModel
   @StringRequired('usuario.role', 1, 50)
   role!: string;
 
-  @Expose()
-  @PhoneOptional('usuario.telefone', 11, 11)
-  telefone?: string;
+  static async create(
+    data: IDocumentData,
+    alreadyExists: boolean,
+  ): Promise<Result<UsuarioModel>> {
+    if (alreadyExists) {
+      return Result.fail('usuario.email_ja_cadastrado');
+    }
 
-  @Expose()
-  @StringOptional('usuario.observacoes', 0, 500)
-  observacoes?: string;
-
-  static async create(data: IDocumentData): Promise<Result<UsuarioModel>> {
     const inst = new UsuarioModel(data);
-    
+
     const errors = await validate(inst);
     if (errors.length > 0) {
       return Result.fail(errors);

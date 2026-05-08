@@ -13,7 +13,11 @@ export class SequelizeUsuarioRepository extends UsuarioRepository {
   }
 
   async save(usuario: UsuarioRecord): Promise<void> {
-    await this.usuarioModel.create({ ...usuario });
+    await this.usuarioModel.create({
+      name: usuario.name,
+      email: usuario.email,
+      role: usuario.role,
+    });
   }
 
   async findAll(): Promise<UsuarioRecord[]> {
@@ -23,5 +27,15 @@ export class SequelizeUsuarioRepository extends UsuarioRepository {
       email: row.email,
       role: row.role,
     }));
+  }
+
+  async findByEmail(email: string): Promise<UsuarioRecord | null> {
+    const row = await this.usuarioModel.findOne({ where: { email } });
+    if (!row) return null;
+    return {
+      name: row.name,
+      email: row.email,
+      role: row.role,
+    };
   }
 }
