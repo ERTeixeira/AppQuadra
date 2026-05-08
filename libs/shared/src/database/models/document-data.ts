@@ -22,7 +22,6 @@ export abstract class DocumentData implements IDocumentData {
   eventId?: string;
 
   constructor(data: IDocumentData) {
-    this.id = '';
     this.updatedAt = new Date();
     this.version = undefined;
     this.eventId = undefined;
