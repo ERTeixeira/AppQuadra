@@ -1,4 +1,6 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppQuadraModule } from './app-quadra.module';
 
 /**
@@ -14,12 +16,24 @@ async function bootstrap() {
   
   // Configurar prefixo global
   app.setGlobalPrefix('api');
-  
+
+  // Validação global de DTOs
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+
+  // Configurar Swagger
+  const config = new DocumentBuilder()
+    .setTitle('AppQuadra API')
+    .setDescription('Documentação da API do AppQuadra')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
+
   // Iniciar aplicação
   const port = process.env.APP_PORT || 3333;
   await app.listen(port);
   
-  console.log(`🚀 AppQuadra rodando em http://localhost:${port}/api`);
+  console.log(`🚀 AppQuadra rodando em http://localhost:${port}/swagger`);
 }
 
 bootstrap().catch((err) => {
