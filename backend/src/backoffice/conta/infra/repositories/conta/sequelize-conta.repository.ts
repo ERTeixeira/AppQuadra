@@ -1,47 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { ContaRecord, ContaRepository } from '../../../domain/interfaces/conta.repository';
-import { ContaPersistenceModel } from '../../models/conta.persistence.model';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/sequelize";
+import { SequelizeBaseRepository } from "../../../../../common/repositories/sequelize-base.repository";
+import {
+  ContaRecord,
+  ContaRepository,
+} from "../../../domain/interfaces/conta.repository";
+import { ContaPersistenceModel } from "../../models/conta.persistence.model";
 
 @Injectable()
-export class SequelizeContaRepository extends ContaRepository {
+export class SequelizeContaRepository
+  extends SequelizeBaseRepository<ContaRecord, ContaPersistenceModel>
+  implements ContaRepository
+{
   constructor(
     @InjectModel(ContaPersistenceModel)
-    private readonly model: typeof ContaPersistenceModel,
+    model: typeof ContaPersistenceModel,
   ) {
-    super();
+    super(model);
   }
 
-  async save(conta: ContaRecord): Promise<void> {
-    await this.model.create({ ...conta });
-  }
-
-  async findAll(): Promise<ContaRecord[]> {
-    const rows = await this.model.findAll();
-    return rows.map((r) => ({
-      id: r.id,
-      name: r.name,
-      email: r.email,
-      senhaHash: r.senhaHash,
-      cnpj: r.cnpj,
-    }));
-  }
-
-  async findByEmail(email: string): Promise<ContaRecord | null> {
-    const row = await this.model.findOne({ where: { email } });
-    if (!row) return null;
-    return { id: row.id, name: row.name, email: row.email, senhaHash: row.senhaHash, cnpj: row.cnpj };
-  }
-
-  async findByCnpj(cnpj: string): Promise<ContaRecord | null> {
-    const row = await this.model.findOne({ where: { cnpj } });
-    if (!row) return null;
-    return { id: row.id, name: row.name, email: row.email, senhaHash: row.senhaHash, cnpj: row.cnpj };
-  }
-
-  async findById(id: string): Promise<ContaRecord | null> {
-    const row = await this.model.findByPk(id);
-    if (!row) return null;
-    return { id: row.id, name: row.name, email: row.email, senhaHash: row.senhaHash, cnpj: row.cnpj };
+  protected toRecord(row: ContaPersistenceModel): ContaRecord {
+    return {
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      senhaHash: row.senhaHash,
+      cnpj: row.cnpj,
+    };
   }
 }

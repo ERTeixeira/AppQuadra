@@ -1,3 +1,5 @@
+import { BaseRepository } from "../../../../common/repositories/base.repository";
+
 export type ContaRecord = {
   id: string;
   name: string;
@@ -6,10 +8,4 @@ export type ContaRecord = {
   cnpj: string;
 };
 
-export abstract class ContaRepository {
-  abstract save(conta: ContaRecord): Promise<void>;
-  abstract findAll(): Promise<ContaRecord[]>;
-  abstract findByEmail(email: string): Promise<ContaRecord | null>;
-  abstract findByCnpj(cnpj: string): Promise<ContaRecord | null>;
-  abstract findById(id: string): Promise<ContaRecord | null>;
-}
+export abstract class ContaRepository extends BaseRepository<ContaRecord> {}
