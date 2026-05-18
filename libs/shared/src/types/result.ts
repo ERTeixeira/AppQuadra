@@ -1,33 +1,74 @@
-/**
- * Tipo genérico de resultado para operações
- */
-export class Result<T = any> {
+export class Result<T> {
+  public isSuccess: boolean;
+  public isFailure: boolean;
+  public error: any;
+  public message: string | undefined;
+  public technicalError: string | undefined;
+  public errorCode: number | undefined;
+  private readonly value: T | undefined;
+
   private constructor(
-    public isSuccess: boolean,
-    public isFailure: boolean,
-    public value?: T,
-    public error?: string | any,
-  ) {}
+    isSuccess: boolean,
+    error?: any,
+    value?: T,
+    message?: string,
+    technicalError?: string,
+    errorCode?: number,
+  ) {
+    if (isSuccess && error) {
+      throw new Error(
+        `Operação inválida: O resultado com sucesso não pode conter mensagem de erro.`,
+      );
+    }
+    if (!isSuccess && !error) {
+      throw new Error(`Operação inválida: É necessário uma mensagem de erro.`);
+    }
 
-  static ok<U>(value?: U): Result<U> {
-    return new Result<U>(true, false, value, undefined);
+    this.isSuccess = isSuccess;
+    this.isFailure = !isSuccess;
+    this.error = error;
+    this.technicalError = technicalError;
+    this.message = message;
+    this.value = value;
+    this.errorCode = errorCode;
+
+    Object.freeze(this);
   }
 
-  static fail<U>(error: string | any): Result<U> {
-    return new Result<U>(false, true, undefined, error);
+  public getValue(): T {
+    if (!this.isSuccess) {
+      throw new Error(`Não é possível retornar esse valor para uma operação com erro.`);
+    }
+
+    return this.value as T;
   }
 
-  getValue(): T {
+  public formatErrorAndTechnicalError(separator: string = ' - '): string {
     if (this.isSuccess) {
-      return this.value!;
+      throw new Error(`Não é possível retornar esse valor para uma operação bem sucedida.`);
     }
-    throw new Error(`Called getValue on a failure result: ${this.error}`);
+
+    return `${this.error}${this.technicalError ? `${separator}${this.technicalError}` : ''}`;
   }
 
-  getError(): string | any {
-    if (this.isFailure) {
-      return this.error;
+  public static ok<U>(value?: U, message?: string): Result<U> {
+    return new Result<U>(true, null, value, message);
+  }
+
+  public static fail<U>(error: any, technicalError?: string, errorCode?: number): Result<U> {
+    if (error instanceof Result) {
+      errorCode = error.errorCode;
+      technicalError = error.technicalError;
+      error = error.error;
     }
-    throw new Error('Called getError on a success result');
+
+    return new Result<U>(false, error, undefined, undefined, technicalError, errorCode);
+  }
+
+  public static combine(results: Result<any>[]): Result<any> {
+    for (const result of results) {
+      if (result.isFailure) return result;
+    }
+    return Result.ok<any>();
   }
 }

@@ -14,6 +14,9 @@
 export * from './database/interfaces/document-data.interface.js';
 export * from './database/models/document-data.js';
 
+// Types module
+export * from './types/result.js';
+
 // Decorators module
 export * from './decorators/validation-message.js';
 export * from './decorators/validation.decorators.js';

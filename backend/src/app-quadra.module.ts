@@ -1,19 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { BackofficeModule } from './backoffice/backoffice.module';
 import { DatabaseModule } from './common/database/database.module';
 import { HttpModule } from './common/http/http.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
 
-import { UsuarioModule } from './modules/usuario/usuario.module';
-
-/**
- * AppQuadra Main Module
- * Organiza todos os módulos de domínio seguindo a arquitetura do Core-ERP
- * 
- * Módulos Importados:
- * - DatabaseModule: Configuração de banco de dados (Global)
- * - HttpModule: Configuração de requisições HTTP
- * - Módulos de Domínio: Agendamento, Empresa, Quadra, Usuario
- */
 @Module({
   imports: [
     // Global/Common Modules
@@ -21,8 +13,12 @@ import { UsuarioModule } from './modules/usuario/usuario.module';
     DatabaseModule,
     HttpModule,
 
-    // Domain Modules
-    UsuarioModule,
+    // Auth
+    AuthModule,
+
+    // Bounded Contexts
+    BackofficeModule,
+    MarketplaceModule,
   ],
 })
 export class AppQuadraModule {}
